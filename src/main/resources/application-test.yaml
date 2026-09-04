@@ -1,0 +1,24 @@
+server:
+  port: 0
+
+spring:
+  data:
+    mongodb:
+      uri: ${spring.data.mongodb.uri}
+  liquibase:
+    url: ${spring.liquibase.url}
+  kafka:
+    bootstrap-servers: ${spring.kafka.bootstrap-servers}
+    topic:
+      payment:
+        name: payment-events
+        partitions: 1
+        replicas: 1
+
+application:
+  integration:
+    order-service:
+      url: ${application.integration.order-service.url}
+    external-payment-service:
+      url: ${application.integration.external-payment-service.url}
+      api-key: test-api-key

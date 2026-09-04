@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://${DB_USERNAME:mongo}:${DB_PASSWORD:password}@${DB_HOST:payment-service-db}:${DB_PORT:27017}/${DB_NAME:payment_service_db}?authSource=admin&replicaSet=rs0
+  liquibase:
+    url: mongodb://${DB_USERNAME:mongo}:${DB_PASSWORD:password}@${DB_HOST:payment-service-db}:${DB_PORT:27017}/${DB_NAME:payment_service_db}?authSource=admin&replicaSet=rs0
+  kafka:
+    bootstrap-servers: ${KAFKA_1_HOST:kafka-1}:${KAFKA_1_PORT:9092},${KAFKA_2_HOST:kafka-2}:${KAFKA_2_PORT:9094},${KAFKA_3_HOST:kafka-3}:${KAFKA_3_PORT:9095}
+
+application:
+  integration:
+    order-service:
+      url: ${ORDER_SERVICE_URL:http://order-app:8082}

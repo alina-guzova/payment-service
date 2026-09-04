@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2026-08-28-create-payments-collection
+      author: HuzovaAlina
+      changes:
+        - createCollection:
+            collectionName: payments
+            validator:
+              $jsonSchema:
+                bsonType: object
+                required: [ "order_id", "user_id", "status", "payment_amount", "timestamp" ]
+                properties:
+                  order_id:
+                    bsonType: long
+                    description: "Must be a long and is required"
+                  user_id:
+                    bsonType: long
+                    description: "Must be a long and is required"
+                  status:
+                    bsonType: string
+                    description: "Must be a string and is required"
+                  payment_amount:
+                    bsonType: double
+                    description: "Must be a decimal and is required"
+                  timestamp:
+                    bsonType: date
+                    description: "Must be a date and is required"
