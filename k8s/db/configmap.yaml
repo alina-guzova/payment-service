@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-service-db-config
+  namespace: dev
+data:
+  DB_NAME: payment_service_db
