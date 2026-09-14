@@ -1,0 +1,71 @@
+services:
+  payment-service:
+    build:
+      dockerfile: Dockerfile
+    container_name: payment-app
+    ports:
+      - "${PAYMENT_APP_PORT:-8083}:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-docker}
+      DB_HOST: payment-service-db
+      DB_PORT: "${DB_PORT:-27017}"
+      DB_NAME: ${DB_NAME:-payment_service_db}
+      DB_USERNAME: ${DB_USER:-mongo}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+    depends_on:
+      payment-service-db:
+        condition: service_healthy
+
+  payment-service-db:
+    image: mongo:7.0
+    container_name: payment-service-db
+    ports:
+      - "${DB_PORT:-27017}:27017"
+    command: [ "--bind_ip_all", "--replSet", "rs0" ]
+    volumes:
+      - mongo_payment:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  mongo-init:
+    image: mongo:7.0
+    depends_on:
+      payment-service-db:
+        condition: service_healthy
+    environment:
+      - DB_USERNAME=${DB_USERNAME:-mongo}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+    command: >
+      mongosh --host payment-service-db --eval "
+        try {
+          rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'payment-service-db:27017' }] });
+      
+          print('Waiting for replica set to become primary...');
+          while (!db.isMaster().ismaster) {
+            sleep(1000);
+          }
+      
+          const adminDB = db.getSiblingDB('admin');
+          adminDB.createUser({
+            user: process.env.DB_USERNAME,
+            pwd: process.env.DB_PASSWORD,
+            roles: [{ role: 'root', db: 'admin' }]
+          });
+      
+          print('Replica set initialized and root user created successfully.');
+        } catch (e) {
+          print('Already initialized or error: ' + e);
+        }
+      "
+
+volumes:
+  mongo_payment:
+
+networks:
+  default:
+    name: microservices-net
+    external: true

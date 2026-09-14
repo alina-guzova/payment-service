@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2026-08-28-add-payments-indexes
+      author: HuzovaAlina
+      changes:
+        - createIndex:
+            collectionName: payments
+            indexName: idx_user_id
+            keys:
+              user_id: 1
+        - createIndex:
+            collectionName: payments
+            indexName: idx_order_id
+            keys:
+              order_id: 1
+        - createIndex:
+            collectionName: payments
+            indexName: idx_status
+            keys:
+              status: 1
